@@ -16,6 +16,7 @@ export interface User extends AbstractDto {
   name?: string;
   email?: string;
   role: string;
+  isAdmin?: boolean;
   // timestamps
   lastLoginAt?: Date;
 }

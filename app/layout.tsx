@@ -1,15 +1,20 @@
 import "./globals.css";
 import type React from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Fredoka } from "next/font/google";
 import { AuthProvider } from "@/contexts/auth.context";
+import { AdminFab } from "@/components/molecules/admin-fab";
 
-const inter = Inter({ subsets: ["latin"] });
+const fredoka = Fredoka({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-fredoka"
+});
 
 export const metadata: Metadata = {
-  title: "MVP Template - Gestão de Recursos",
+  title: "Biblioteca da 5ª Avenida - RPG de Mesa",
   description:
-    "Plataforma para gestão de projetos e eventos.",
+    "Financiamento coletivo do novo RPG de mesa fantástico-místico.",
 };
 
 export default function RootLayout({
@@ -18,10 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={inter.className}>
+    <html lang="pt-BR" className={`${fredoka.className} cozy-scroll`}>
       <AuthProvider>
         <body className="min-w-screen min-h-screen w-full h-screen">
           {children}
+          <AdminFab />
         </body>
       </AuthProvider>
     </html>

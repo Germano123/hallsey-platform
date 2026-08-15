@@ -19,13 +19,15 @@ export class AuthService implements IAuthService {
 
   async getOrCreateUser(uid: string): Promise<User> {
     if (isMockMode) {
+      const isMockAdmin = uid.includes("admin") || uid.includes("teste");
       return {
         uid,
-        role: "admin",
+        role: isMockAdmin ? "admin" : "user",
+        isAdmin: isMockAdmin,
         createdAt: getStringDate(new Date()),
         updatedAt: getStringDate(new Date()),
-        name: "Administrador Teste",
-        email: "admin@template.com",
+        name: isMockAdmin ? "Administrador Teste" : "Jogador Guardião",
+        email: isMockAdmin ? "admin@template.com" : "guardiao@template.com",
       };
     }
 
@@ -38,6 +40,7 @@ export class AuthService implements IAuthService {
         const newUser: User = {
           uid,
           role: "user",
+          isAdmin: false,
           createdAt: getStringDate(new Date()),
           updatedAt: getStringDate(new Date()),
         };
@@ -56,9 +59,11 @@ export class AuthService implements IAuthService {
 
   async login(credentials: Credentials): Promise<LoggedUser | null> {
     if (isMockMode) {
+      const isMockAdmin = credentials.email.includes("admin") || credentials.email.includes("teste");
       const mockUser: LoggedUser = {
         uid: "mock-uid-" + credentials.email,
-        role: credentials.email.includes("admin") ? "admin" : "user",
+        role: isMockAdmin ? "admin" : "user",
+        isAdmin: isMockAdmin,
         createdAt: getStringDate(new Date()),
         updatedAt: getStringDate(new Date()),
         name: credentials.email.split("@")[0].toUpperCase(),
@@ -82,9 +87,11 @@ export class AuthService implements IAuthService {
 
   async register(credentials: RegisterData): Promise<User> {
     if (isMockMode) {
+      const isMockAdmin = credentials.email.includes("admin") || credentials.email.includes("teste");
       const mockUser: User = {
         uid: "mock-uid-" + credentials.email,
-        role: "user",
+        role: isMockAdmin ? "admin" : "user",
+        isAdmin: isMockAdmin,
         createdAt: getStringDate(new Date()),
         updatedAt: getStringDate(new Date()),
         name: credentials.name || credentials.email.split("@")[0].toUpperCase(),

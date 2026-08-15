@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [authService]
   );
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.isAdmin === true || user?.role === "admin";
 
   return (
     <AuthContext.Provider

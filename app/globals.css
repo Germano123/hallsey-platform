@@ -94,3 +94,93 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+:root {
+  --bg-dark: #121214;
+  --bg-card: #1c1c22;
+  --bg-footer: #0c0c0e;
+  --color-green: #10b981;
+  --color-green-light: #34d399;
+  --color-orange: #f97316;
+  --color-orange-light: #fb923c;
+  --color-cream: #f4ebd0;
+  --color-text-muted: #94a3b8;
+  --wood-dark: #5c3a21;
+  --wood-medium: #8b5a2b;
+  --wood-light: #cd853f;
+  --wood-bg: rgba(139, 90, 43, 0.08);
+  --font-cozy: 'Fredoka', sans-serif;
+  --border-radius-lg: 20px;
+  --border-radius-md: 12px;
+  --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.font-cozy {
+  font-family: var(--font-cozy);
+}
+
+.cozy-scroll ::-webkit-scrollbar,
+::-webkit-scrollbar {
+  width: 10px;
+}
+.cozy-scroll ::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+.cozy-scroll ::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+  background: var(--wood-medium);
+  border-radius: 10px;
+  border: 2px solid var(--bg-dark);
+}
+.cozy-scroll ::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
+  background: var(--wood-light);
+}
+
+.card-panel {
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border-top: 4px solid var(--wood-medium);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.card-panel:hover {
+  transform: translateY(-3px);
+  border-top-color: var(--color-orange);
+}
+
+.project-slideshow {
+  display: flex;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  gap: 4px;
+}
+.project-slideshow .slide {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(80%);
+  transition: flex 0.45s ease, filter 0.45s ease, transform 0.45s ease;
+  clip-path: polygon(15% 0, 100% 0, 85% 100%, 0 100%);
+  margin-left: -35px;
+}
+.project-slideshow .slide:first-child {
+  margin-left: 0;
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+}
+.project-slideshow .slide:last-child {
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+}
+.project-slideshow:hover .slide {
+  flex: 0.8;
+}
+.project-slideshow .slide:hover {
+  flex: 3;
+  filter: grayscale(0%);
+  z-index: 2;
+}
