@@ -55,7 +55,7 @@ export function AdminFab() {
       {isOpen && (
         <div className="absolute bottom-16 right-0 mb-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 flex flex-col gap-1.5 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="px-2.5 py-1.5 border-b border-slate-100 flex justify-between items-center">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Gestão do Mestre</span>
+            <span className="text-cozy-xs text-slate-500 font-bold uppercase tracking-wider">Gestão do Mestre</span>
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
           </div>
 
@@ -67,7 +67,7 @@ export function AdminFab() {
                   key={i}
                   href={route.href}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100"
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-cozy-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100"
                 >
                   <IconComponent className="w-4 h-4 text-emerald-600" />
                   <span>{route.name}</span>

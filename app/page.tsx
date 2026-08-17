@@ -133,7 +133,7 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-4">
           {user ? (
-            <Link href="/dashboard" className="px-5 py-2 rounded-full border-2 border-[#10b981] text-[#34d399] hover:bg-[#10b981]/10 text-xs font-semibold transition-all">
+            <Link href="/portal" className="px-5 py-2 rounded-full border-2 border-[#10b981] text-[#34d399] hover:bg-[#10b981]/10 text-xs font-semibold transition-all">
               Acessar Portal ({user.name?.split(" ")[0]})
             </Link>
           ) : (

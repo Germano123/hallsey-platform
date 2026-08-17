@@ -184,3 +184,30 @@
   filter: grayscale(0%);
   z-index: 2;
 }
+
+@layer utilities {
+  .text-cozy-xs {
+    font-size: 0.8rem !important; /* ~13px */
+    line-height: 1.4 !important;
+  }
+  .text-cozy-sm {
+    font-size: 0.95rem !important; /* ~15px */
+    line-height: 1.5 !important;
+  }
+  .text-cozy-base {
+    font-size: 1.1rem !important; /* ~17.5px */
+    line-height: 1.6 !important;
+  }
+  .text-cozy-lg {
+    font-size: 1.3rem !important; /* ~21px */
+    line-height: 1.5 !important;
+  }
+  .text-cozy-xl {
+    font-size: 1.6rem !important; /* ~25.5px */
+    line-height: 1.4 !important;
+  }
+  .text-cozy-2xl {
+    font-size: 2.2rem !important; /* ~35px */
+    line-height: 1.3 !important;
+  }
+}

@@ -103,13 +103,13 @@ export default function AdminDashboardPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-6">
           <div>
             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#f4ebd0]">Painel de Controle Admin</h2>
-            <p className="text-xs text-[#94a3b8] mt-1">Estatísticas consolidadas de faturamento, usuários cadastrados e gerenciamento de notícias.</p>
+            <p className="text-cozy-sm text-[#94a3b8] mt-1">Estatísticas consolidadas de faturamento, usuários cadastrados e gerenciamento de notícias.</p>
           </div>
 
           <Button 
             onClick={loadData} 
             disabled={dbLoading}
-            className="bg-[#1c1c22] border border-white/10 hover:bg-[#121214] text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-2"
+            className="bg-[#1c1c22] border border-white/10 hover:bg-[#121214] text-cozy-xs font-semibold px-4 py-2 rounded-full flex items-center gap-2"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${dbLoading ? "animate-spin" : ""}`} />
             Recarregar Dados
@@ -227,7 +227,7 @@ export default function AdminDashboardPage() {
             <BlogPostCreator authorName={user?.name || "Administrador"} />
 
             <div className="bg-[#1c1c22] border border-white/5 rounded-[20px] p-6 shadow-xl space-y-4">
-              <h3 className="text-xs font-bold text-[#f4ebd0]">Apoios por Tiers</h3>
+              <h3 className="text-cozy-sm font-bold text-[#f4ebd0]">Apoios por Tiers</h3>
               <div className="h-32 w-full flex justify-center items-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -247,7 +247,7 @@ export default function AdminDashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="space-y-1 text-[10px]">
+              <div className="space-y-1 text-cozy-xs">
                 {tierDistributionData.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center text-[#94a3b8]">
                     <span className="flex items-center gap-1.5">

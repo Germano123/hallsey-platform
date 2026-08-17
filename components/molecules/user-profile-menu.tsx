@@ -46,11 +46,11 @@ export function UserProfileMenu() {
                         {getInitials(user.name || "")}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight text-[#f4ebd0]">
+                    <div className="grid flex-1 text-left text-cozy-sm leading-tight text-[#f4ebd0]">
                       <span className="truncate font-semibold">
                         {user.name}
                       </span>
-                      <span className="truncate text-xs text-muted-foreground uppercase">
+                      <span className="truncate text-cozy-xs text-muted-foreground uppercase">
                         {user.role}
                       </span>
                     </div>
