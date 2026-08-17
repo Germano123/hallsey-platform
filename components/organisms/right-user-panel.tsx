@@ -52,6 +52,7 @@ export function RightUserPanel() {
       icon: Compass,
       active: pathname === "/portal"
     },
+    /* Ocultado temporariamente por indefinição de escopo
     {
       name: "Minhas Fichas NFC",
       href: "/portal/fichas",
@@ -64,6 +65,7 @@ export function RightUserPanel() {
       icon: BookOpen,
       active: pathname === "/portal/biblioteca"
     },
+    */
     {
       name: "Blog & Notícias",
       href: "/blog",
@@ -90,27 +92,27 @@ export function RightUserPanel() {
         </div>
 
         <div className="space-y-1">
-          <h4 className="text-sm font-black text-[#f4ebd0] line-clamp-1">{user.name}</h4>
-          <span className="text-[10px] text-[#94a3b8] uppercase tracking-wider block font-semibold">
+          <h4 className="text-cozy-base font-black text-[#f4ebd0] line-clamp-1">{user.name}</h4>
+          <span className="text-cozy-xs text-[#94a3b8] uppercase tracking-wider block font-semibold">
             {user.role === "admin" ? "Mestre Guardião (Admin)" : `Guardião ${favClass}`}
           </span>
         </div>
 
         {/* Stats metrics */}
-        <div className="w-full grid grid-cols-2 gap-2 pt-3 border-t border-white/5 text-[10px] text-left">
+        <div className="w-full grid grid-cols-2 gap-2 pt-3 border-t border-white/5 text-cozy-xs text-left">
           <div className="bg-[#121214] p-2 rounded-lg border border-white/5">
             <span className="text-[#94a3b8] block">Campanhas</span>
-            <span className="font-bold text-[#f4ebd0] text-sm">{activeCampCount} ativas</span>
+            <span className="font-bold text-[#f4ebd0] text-cozy-sm">{activeCampCount} ativas</span>
           </div>
           <div className="bg-[#121214] p-2 rounded-lg border border-white/5">
             <span className="text-[#94a3b8] block">Status</span>
-            <span className="font-bold text-[#34d399] text-[10px] truncate block" title="Apoiador Guardião">Apoiador</span>
+            <span className="font-bold text-[#34d399] text-cozy-xs truncate block" title="Apoiador Guardião">Apoiador</span>
           </div>
         </div>
 
         <Link 
           href="/perfil" 
-          className="text-xs text-[#fb923c] hover:text-[#f97316] font-bold hover:underline mt-1 pt-1 flex items-center gap-1"
+          className="text-cozy-sm text-[#fb923c] hover:text-[#f97316] font-bold hover:underline mt-1 pt-1 flex items-center gap-1"
         >
           Ver perfil completo →
         </Link>
@@ -118,7 +120,7 @@ export function RightUserPanel() {
 
       {/* CARD 2: Routes Access Navigation Card */}
       <Card className="bg-[#1c1c22] border border-white/5 border-t-4 border-t-[#10b981] p-5 rounded-[20px] shadow-xl flex flex-col gap-3">
-        <h4 className="text-[10px] text-[#94a3b8] uppercase font-bold tracking-widest border-b border-white/5 pb-2">
+        <h4 className="text-cozy-xs text-[#94a3b8] uppercase font-bold tracking-widest border-b border-white/5 pb-2">
           Rotas de Acesso
         </h4>
 
@@ -129,7 +131,7 @@ export function RightUserPanel() {
               <Link 
                 key={i}
                 href={route.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-cozy-sm font-bold transition-all ${
                   route.active 
                     ? "bg-[#10b981]/15 text-[#34d399] border border-[#10b981]/25" 
                     : "text-[#94a3b8] hover:text-[#f4ebd0] hover:bg-white/5 border border-transparent"
