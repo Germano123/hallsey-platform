@@ -15,8 +15,10 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BlogService, Article } from "@/lib/services/blog.service";
+import { useAuth } from "@/contexts/auth.context";
 
 export default function BlogPage() {
+  const { user } = useAuth();
   const blogService = new BlogService();
   
   const [articles, setArticles] = useState<Article[]>([]);
@@ -62,8 +64,11 @@ export default function BlogPage() {
             </div>
           </div>
 
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-[#94a3b8] hover:text-[#f4ebd0] transition-colors bg-white/5 border border-white/10 rounded-full px-4 py-2">
-            <ArrowLeft className="w-3.5 h-3.5" /> Voltar para Home
+          <Link 
+            href={user ? "/portal" : "/"} 
+            className="inline-flex items-center gap-1.5 text-xs text-[#94a3b8] hover:text-[#f4ebd0] transition-colors bg-white/5 border border-white/10 rounded-full px-4 py-2"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> {user ? "Voltar ao Portal" : "Voltar para Home"}
           </Link>
         </header>
 
@@ -98,7 +103,7 @@ export default function BlogPage() {
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             
             {/* Left Area: Grid of articles */}
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 w-full ${selectedArticle ? "lg:w-3/5" : "w-full"}`}>
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 w-full ${selectedArticle ? "lg:w-[55%]" : "w-full"}`}>
               {loading ? (
                 <div className="col-span-full p-12 text-center text-xs text-[#94a3b8]">
                   Carregando artigos do tomo...
@@ -149,9 +154,9 @@ export default function BlogPage() {
               )}
             </div>
 
-            {/* Right Area: Dynamic Article Reader Panel */}
+            {/* Right Area: Dynamic Article Reader Panel (increased to 45% width) */}
             <div className={`w-full lg:sticky lg:top-24 bg-[#1c1c22] border border-white/5 rounded-[20px] shadow-2xl p-6 md:p-8 flex flex-col gap-6 ${
-              selectedArticle ? "lg:w-2/5" : "hidden"
+              selectedArticle ? "lg:w-[45%]" : "hidden"
             }`}>
               {selectedArticle ? (
                 <>
@@ -175,18 +180,25 @@ export default function BlogPage() {
                     <div className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {selectedArticle.author}</div>
                   </div>
 
-                  {/* Article content scroll */}
-                  <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 text-xs md:text-sm text-[#94a3b8] leading-relaxed cozy-scroll">
-                    {selectedArticle.content.map((p, index) => (
-                      <p key={index} className="text-justify">{p}</p>
-                    ))}
+                  {/* Reduced article preview scroll (excerpt + first paragraph only) */}
+                  <div className="space-y-4 text-cozy-sm text-[#94a3b8] leading-relaxed">
+                    <p className="text-justify font-bold text-[#f4ebd0] mb-1">Resumo da Notícia:</p>
+                    <p className="text-justify italic">"{selectedArticle.excerpt}"</p>
+                    <p className="text-justify mt-2">{selectedArticle.content[0] || ""}</p>
+                    <div className="p-3 bg-[#121214] border border-white/5 rounded-xl text-center text-cozy-xs text-[#fb923c] font-semibold mt-4">
+                      ✦ Clique no botão abaixo para ler o manuscrito completo em sua página de leitura dedicada!
+                    </div>
                   </div>
 
-                  <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                    <span className="text-xs text-[#94a3b8]">Gostou desse artigo?</span>
-                    <Link href="/#wishlist">
-                      <Button className="bg-[#f97316] hover:bg-[#fb923c] text-[#121214] font-bold rounded-full text-xs px-5 py-2">
-                        Apoiar Campanha
+                  <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <Link href={`/blog/${selectedArticle.id}`} className="w-full sm:w-auto">
+                      <Button className="w-full bg-[#10b981] hover:bg-[#34d399] text-[#121214] font-bold rounded-full text-cozy-xs px-5 py-2">
+                        Ler Artigo Completo →
+                      </Button>
+                    </Link>
+                    <Link href="https://catarse.me" target="_blank" className="w-full sm:w-auto">
+                      <Button className="w-full bg-[#f97316] hover:bg-[#fb923c] text-[#121214] font-bold rounded-full text-cozy-xs px-5 py-2">
+                        Apoiar no Catarse
                       </Button>
                     </Link>
                   </div>
@@ -201,7 +213,7 @@ export default function BlogPage() {
 
             {/* Default guide if no article selected */}
             {!selectedArticle && (
-              <div className="hidden lg:flex lg:w-2/5 flex-col items-center justify-center text-center p-12 bg-[#1c1c22] border border-white/5 border-dashed rounded-[20px] min-h-[300px]">
+              <div className="hidden lg:flex lg:w-[45%] flex-col items-center justify-center text-center p-12 bg-[#1c1c22] border border-white/5 border-dashed rounded-[20px] min-h-[300px]">
                 <BookOpen className="w-16 h-16 text-[#cd853f] mb-4 opacity-50" />
                 <h3 className="text-lg font-bold text-[#f4ebd0]">Tomo Aberto</h3>
                 <p className="text-xs text-[#94a3b8] mt-2 max-w-[280px]">
