@@ -20,7 +20,7 @@ const defaultMeta: CrowdfundingMeta = {
 };
 
 export class CrowdfundingService {
-  private docRefPath = "config/crowdfunding";
+  private docRefPath = "admin/crowdfunding";
 
   // Get current crowdfunding configurations
   async getMeta(): Promise<CrowdfundingMeta> {
@@ -38,7 +38,7 @@ export class CrowdfundingService {
     }
 
     try {
-      const docRef = doc(db, "config", "crowdfunding");
+      const docRef = doc(db, "admin", "crowdfunding");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -69,7 +69,7 @@ export class CrowdfundingService {
     }
 
     try {
-      const docRef = doc(db, "config", "crowdfunding");
+      const docRef = doc(db, "admin", "crowdfunding");
       await setDoc(docRef, {
         currentFunding: meta.currentFunding,
         targetFunding: meta.targetFunding,
