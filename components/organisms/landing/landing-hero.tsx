@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { WishlistService } from "@/lib/services/wishlist.service";
+import { CrowdfundingService, CrowdfundingMeta } from "@/lib/services/crowdfunding.service";
 import { 
   Users, 
   Sparkles, 
@@ -13,15 +14,24 @@ import {
 
 export function LandingHero() {
   const wishlistService = new WishlistService();
-  const [wishlistCount, setWishlistCount] = useState<number>(1284);
+  const crowdfundingService = new CrowdfundingService();
 
-  const currentFunding = 42850;
-  const targetFunding = 50000;
-  const fundingPercent = Math.round((currentFunding / targetFunding) * 100);
+  const [wishlistCount, setWishlistCount] = useState<number>(1284);
+  const [funding, setFunding] = useState<CrowdfundingMeta>({
+    currentFunding: 42850,
+    targetFunding: 50000,
+    backerCount: 432,
+    daysRemaining: 18
+  });
+
+  const fundingPercent = Math.round((funding.currentFunding / funding.targetFunding) * 100);
 
   useEffect(() => {
     wishlistService.getWishlist().then(list => {
       setWishlistCount(1284 + list.length);
+    });
+    crowdfundingService.getMeta().then(data => {
+      setFunding(data);
     });
   }, []);
 
@@ -54,7 +64,7 @@ export function LandingHero() {
             <div>
               <span className="text-xs text-[#94a3b8] uppercase font-medium">Meta Apoiada</span>
               <div className="text-2xl font-bold text-[#f4ebd0]">
-                R$ {currentFunding.toLocaleString("pt-BR")} <span className="text-xs font-normal text-[#94a3b8]">de R$ {targetFunding.toLocaleString("pt-BR")}</span>
+                R$ {funding.currentFunding.toLocaleString("pt-BR")} <span className="text-xs font-normal text-[#94a3b8]">de R$ {funding.targetFunding.toLocaleString("pt-BR")}</span>
               </div>
             </div>
             <div className="text-right">
@@ -73,11 +83,11 @@ export function LandingHero() {
 
           <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5 text-center">
             <div>
-              <div className="text-sm font-semibold text-[#f4ebd0]">432</div>
+              <div className="text-sm font-semibold text-[#f4ebd0]">{funding.backerCount}</div>
               <div className="text-[10px] text-[#94a3b8] uppercase">Apoiadores</div>
             </div>
             <div>
-              <div className="text-sm font-semibold text-[#f4ebd0]">18 Dias</div>
+              <div className="text-sm font-semibold text-[#f4ebd0]">{funding.daysRemaining} Dias</div>
               <div className="text-[10px] text-[#94a3b8] uppercase">Restantes</div>
             </div>
             <div>

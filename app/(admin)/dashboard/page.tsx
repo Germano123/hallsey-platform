@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/auth.context";
 import { WishlistService, WishlistEntry } from "@/lib/services/wishlist.service";
+import { CrowdfundingService, CrowdfundingMeta } from "@/lib/services/crowdfunding.service";
 import { StatCard } from "@/components/molecules/stat-card";
 import { BlogPostCreator } from "@/components/organisms/blog-post-creator";
 import { 
@@ -27,25 +28,43 @@ import {
   TrendingUp, 
   Sparkles, 
   RefreshCw,
-  Library
+  Sliders,
+  Save
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
   const wishlistService = new WishlistService();
+  const crowdfundingService = new CrowdfundingService();
 
   const [wishlistData, setWishlistData] = useState<WishlistEntry[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [classStats, setClassStats] = useState<any[]>([]);
   const [wishlistCount, setWishlistCount] = useState(1284);
 
+  // Crowdfunding Meta state
+  const [crowdMeta, setCrowdMeta] = useState<CrowdfundingMeta>({
+    currentFunding: 42850,
+    targetFunding: 50000,
+    backerCount: 432,
+    daysRemaining: 18
+  });
+  const [metaSaving, setMetaSaving] = useState(false);
+
   const loadData = async () => {
     setDbLoading(true);
     try {
+      // Load wishlist
       const list = await wishlistService.getWishlist();
       setWishlistData(list);
       setWishlistCount(1284 + list.length);
+
+      // Load Crowdfunding goals config
+      const meta = await crowdfundingService.getMeta();
+      setCrowdMeta(meta);
 
       // Class distribution initial statistics
       const counts: Record<string, number> = {
@@ -77,6 +96,20 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleUpdateMeta = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMetaSaving(true);
+    try {
+      await crowdfundingService.updateMeta(crowdMeta);
+      alert("Metas financeiras salvas com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao salvar configurações de metas.");
+    } finally {
+      setMetaSaving(false);
+    }
+  };
 
   // Mock chart details
   const fundingGrowthData = [
@@ -121,8 +154,8 @@ export default function AdminDashboardPage() {
           
           <StatCard 
             title="Faturamento Total"
-            value="R$ 42.850"
-            subText="+R$ 14.500 este mês"
+            value={`R$ ${crowdMeta.currentFunding.toLocaleString("pt-BR")}`}
+            subText={`Meta: R$ ${crowdMeta.targetFunding.toLocaleString("pt-BR")}`}
             icon={Coins}
             iconColorClass="text-[#f97316]"
             borderTopColorClass="border-t-[#f97316]"
@@ -138,19 +171,19 @@ export default function AdminDashboardPage() {
           />
 
           <StatCard 
-            title="Cartões NFC Ativos"
-            value="843"
-            subText="Média 2.2 cartões / apoiador"
-            icon={CreditCard}
+            title="Apoiadores Ativos"
+            value={crowdMeta.backerCount}
+            subText="Nível de conversão alto"
+            icon={Sparkles}
             iconColorClass="text-[#cd853f]"
             borderTopColorClass="border-t-[#cd853f]"
           />
 
           <StatCard 
-            title="Progresso Crowdfunding"
-            value="85.7%"
-            subText="Meta de R$ 50.000 próxima"
-            icon={Sparkles}
+            title="Dias Restantes"
+            value={`${crowdMeta.daysRemaining} dias`}
+            subText="Encerramento de ciclo"
+            icon={CreditCard}
             iconColorClass="text-purple-400"
             borderTopColorClass="border-t-purple-500"
             subTextColor="text-purple-400"
@@ -226,6 +259,73 @@ export default function AdminDashboardPage() {
           <div className="space-y-8">
             <BlogPostCreator authorName={user?.name || "Administrador"} />
 
+            {/* Crowdfunding Meta Editor Form Section */}
+            <div className="bg-[#1c1c22] border border-white/5 rounded-[20px] p-6 shadow-xl space-y-4">
+              <h3 className="text-cozy-sm font-bold text-[#f4ebd0] flex items-center gap-2 border-b border-white/5 pb-2">
+                <Sliders className="w-4 h-4 text-[#fb923c]" /> Configurações de Metas
+              </h3>
+              
+              <form onSubmit={handleUpdateMeta} className="space-y-3.5">
+                <div className="space-y-1">
+                  <Label htmlFor="meta-current" className="text-cozy-xs text-[#94a3b8]">Valor Atual (R$)</Label>
+                  <Input 
+                    id="meta-current"
+                    type="number"
+                    value={crowdMeta.currentFunding}
+                    onChange={(e) => setCrowdMeta(prev => ({ ...prev, currentFunding: Number(e.target.value) }))}
+                    className="bg-[#121214] border-white/10 text-cozy-xs rounded-lg text-[#f4ebd0] h-9"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="meta-target" className="text-cozy-xs text-[#94a3b8]">Valor Desejado (R$)</Label>
+                  <Input 
+                    id="meta-target"
+                    type="number"
+                    value={crowdMeta.targetFunding}
+                    onChange={(e) => setCrowdMeta(prev => ({ ...prev, targetFunding: Number(e.target.value) }))}
+                    className="bg-[#121214] border-white/10 text-cozy-xs rounded-lg text-[#f4ebd0] h-9"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="meta-backers" className="text-cozy-xs text-[#94a3b8]">Quantidade de Apoiadores</Label>
+                  <Input 
+                    id="meta-backers"
+                    type="number"
+                    value={crowdMeta.backerCount}
+                    onChange={(e) => setCrowdMeta(prev => ({ ...prev, backerCount: Number(e.target.value) }))}
+                    className="bg-[#121214] border-white/10 text-cozy-xs rounded-lg text-[#f4ebd0] h-9"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="meta-days" className="text-cozy-xs text-[#94a3b8]">Dias Restantes</Label>
+                  <Input 
+                    id="meta-days"
+                    type="number"
+                    value={crowdMeta.daysRemaining}
+                    onChange={(e) => setCrowdMeta(prev => ({ ...prev, daysRemaining: Number(e.target.value) }))}
+                    className="bg-[#121214] border-white/10 text-cozy-xs rounded-lg text-[#f4ebd0] h-9"
+                    required
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={metaSaving}
+                  className="w-full bg-[#f97316] hover:bg-[#fb923c] text-[#121214] font-bold text-cozy-xs h-9 rounded-full mt-2 flex items-center justify-center gap-1.5"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  Salvar Parâmetros
+                </Button>
+              </form>
+            </div>
+
+            {/* Tiers distribution */}
             <div className="bg-[#1c1c22] border border-white/5 rounded-[20px] p-6 shadow-xl space-y-4">
               <h3 className="text-cozy-sm font-bold text-[#f4ebd0]">Apoios por Tiers</h3>
               <div className="h-32 w-full flex justify-center items-center">

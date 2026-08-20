@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth.context";
 import { CampaignService, Invitation } from "@/lib/services/campaign.service";
+import { CrowdfundingService, CrowdfundingMeta } from "@/lib/services/crowdfunding.service";
 import "../../globals.css";
 
 export default function UserPortalPage() {
@@ -18,10 +19,20 @@ export default function UserPortalPage() {
   const { user } = useAuth();
   const blogService = new BlogService();
   const campaignService = new CampaignService();
+  const crowdfundingService = new CrowdfundingService();
 
   const [articles, setArticles] = useState<Article[]>([]);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Crowdfunding configuration state
+  const [funding, setFunding] = useState<CrowdfundingMeta>({
+    currentFunding: 42850,
+    targetFunding: 50000,
+    backerCount: 432,
+    daysRemaining: 18
+  });
+  const fundingPercent = Math.round((funding.currentFunding / funding.targetFunding) * 100);
 
   // Invitations / Notifications state
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -183,11 +194,11 @@ export default function UserPortalPage() {
           {/* Progress bar and metrics */}
           <div className="space-y-1.5 max-w-lg">
             <div className="flex justify-between text-cozy-xs text-[#94a3b8]">
-              <span>Progresso Financeiro: <b>R$ 42.850</b> / R$ 50.000</span>
-              <span className="font-bold text-[#fb923c]">85.7% batido</span>
+              <span>Progresso Financeiro: <b>R$ {funding.currentFunding.toLocaleString("pt-BR")}</b> / R$ {funding.targetFunding.toLocaleString("pt-BR")}</span>
+              <span className="font-bold text-[#fb923c]">{fundingPercent}% batido</span>
             </div>
             <div className="w-full bg-[#121214] h-2 rounded-full overflow-hidden border border-white/5">
-              <div className="bg-[#fb923c] h-full rounded-full transition-all duration-1000" style={{ width: "85.7%" }} />
+              <div className="bg-[#fb923c] h-full rounded-full transition-all duration-1000" style={{ width: `${fundingPercent}%` }} />
             </div>
             <p className="text-[10px] text-slate-500 italic">Atualizado diariamente pela Ordem dos Guardiões.</p>
           </div>

@@ -47,7 +47,7 @@ export function LandingNfcMechanic() {
         </div>
         <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#f4ebd0]">O Poder das Cartas NFC</h2>
         <p className="text-[#94a3b8] max-w-2xl mx-auto text-sm md:text-base">
-          Seus feitiços, itens lendários e companheiros estão selados em **cartões físicos colecionáveis** equipados com chips NFC. Encoste-os no celular ou leitor USB e veja a mágica acontecer!
+          Seus feitiços, itens lendários e companheiros estão selados em <b>cartões físicos colecionáveis</b> equipados com chips NFC. Encoste-os no celular ou leitor USB e veja a mágica acontecer!
         </p>
       </div>
 

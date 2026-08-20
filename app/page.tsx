@@ -33,10 +33,10 @@ export default function LandingPage() {
       <LandingWishlist />
 
       {/* 6. Crowdfunding Tiers Section */}
-      <LandingTiers />
+      {/* <LandingTiers /> */}
 
       {/* 7. Design Diagonal Slideshow Showcase */}
-      <LandingSlideshow />
+      {/* <LandingSlideshow /> */}
 
       {/* 8. Cozy Footer */}
       <LandingFooter />
