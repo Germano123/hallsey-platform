@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { 
@@ -8,29 +8,24 @@ import {
   BookOpen, 
   Users, 
   Crown, 
-  Play, 
-  PlusCircle, 
-  Map, 
   FileText, 
-  Trash2 
+  X,
+  ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface Campaign {
-  id: string;
-  name: string;
-  desc: string;
-  mestre: string;
-  jogadores: string[];
-  convites: string[];
-}
+import { useAuth } from "@/contexts/auth.context";
+import { CampaignService, Campaign } from "@/lib/services/campaign.service";
+import "../../../../globals.css";
 
 export default function CampaignDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
+  
+  const { user } = useAuth();
+  const campaignService = new CampaignService();
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,52 +35,42 @@ export default function CampaignDetailsPage() {
     "Sessão 1: O Encontro na Estante Central — O grupo desvendou as runas antigas nas prateleiras.",
     "Sessão 2: A Sombra da Fera Bibliófaga — Carlos quase perdeu seu grimório no combate do corredor."
   ]);
+  
   const [sharedItems, setSharedItems] = useState<string[]>([
     "Grimório Rúnico Incompleto (Item de Missão)",
     "Chave de Metal Antiga (Destranca Setor Sombrio)",
     "Lente de Tradução Mística"
   ]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("portal-campaigns");
-      let list: Campaign[] = [];
-      
-      if (stored) {
-        try {
-          list = JSON.parse(stored);
-        } catch (e) {}
-      }
-
-      // Default campaigns if not in local storage yet
-      if (list.length === 0) {
-        list = [
-          {
-            id: "camp-1",
-            name: "A Cripta de Alexandria",
-            desc: "Investigando o desaparecimento de tomos do século IV nas profundezas das catacumbas.",
-            mestre: "Mestre Germano",
-            jogadores: ["bruno@email.com", "ana@email.com"],
-            convites: []
-          },
-          {
-            id: "camp-2",
-            name: "O Segredo da 5ª Avenida",
-            desc: "Sua primeira missão oficial como Guardião no setor central de Nova York.",
-            mestre: "Você",
-            jogadores: ["carlos@email.com"],
-            convites: ["mariana@email.com (Pendente)"]
-          }
-        ];
-      }
-
-      const found = list.find(c => c.id === id);
-      if (found) {
+  const loadCampaign = useCallback(async () => {
+    if (id) {
+      setLoading(true);
+      try {
+        const found = await campaignService.getCampaignById(id);
         setCampaign(found);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    loadCampaign();
+  }, [loadCampaign]);
+
+  const handleRemovePlayer = async (playerEmail: string) => {
+    if (!campaign) return;
+    if (!confirm(`Deseja remover o jogador ${playerEmail} desta campanha?`)) return;
+
+    try {
+      await campaignService.removePlayer(campaign.id, playerEmail);
+      loadCampaign();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (loading) {
     return (
@@ -107,6 +92,26 @@ export default function CampaignDetailsPage() {
     );
   }
 
+  // Safety/Security Association Check: must be GM or Player
+  const isMestre = campaign.mestre === user?.email || campaign.mestre === "Você";
+  const isPlayer = campaign.jogadores.includes(user?.email || "");
+  const hasAccess = isMestre || isPlayer;
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-[#121214] text-[#f4ebd0] flex flex-col items-center justify-center font-cozy p-6 space-y-4">
+        <ShieldAlert className="w-16 h-16 text-red-500 animate-bounce" />
+        <h3 className="text-xl font-bold text-red-400">Acesso Negado</h3>
+        <p className="text-cozy-sm text-[#94a3b8] text-center max-w-sm">
+          Você não faz parte desta mesa de RPG e não tem permissão para visualizar suas crônicas.
+        </p>
+        <Button onClick={() => router.push("/portal")} className="bg-[#fb923c] hover:bg-[#f97316] text-[#121214] font-bold rounded-full px-6 py-2.5">
+          Voltar ao Painel
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 font-cozy relative z-10 max-w-4xl mx-auto">
       
@@ -115,7 +120,7 @@ export default function CampaignDetailsPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Badge className="bg-[#fb923c]/20 text-[#fb923c] border-none text-[10px] font-bold uppercase py-0.5">
-              {campaign.mestre === "Você" ? "Mestre da Mesa" : "Jogador"}
+              {isMestre ? "Mestre da Mesa" : "Jogador"}
             </Badge>
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-[#f4ebd0] tracking-tight">{campaign.name}</h2>
@@ -138,18 +143,7 @@ export default function CampaignDetailsPage() {
         {/* Main Dashboard - Left 2 Columns */}
         <div className="md:col-span-2 space-y-6">
           
-          {/* Quick VTT Actions */}
-          <Card className="bg-gradient-to-r from-[#8b5a2b]/30 to-[#1c1c22]/80 border border-[#cd853f]/30 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xl">
-            <div className="space-y-1">
-              <h4 className="text-cozy-base font-bold text-[#f4ebd0]">Mesa de Jogo Ativa</h4>
-              <p className="text-cozy-xs text-[#94a3b8]">Inicie a sessão virtual para compartilhar mapas, tokens e rolar dados.</p>
-            </div>
-            <Button className="bg-[#fb923c] hover:bg-[#f97316] text-[#121214] font-black rounded-full text-cozy-sm px-6 py-2.5 flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95">
-              <Play className="w-4 h-4 fill-[#121214]" /> Entrar no VTT
-            </Button>
-          </Card>
-
-          {/* Diary / Journal Section */}
+          {/* Diary / Journal Section (Mock logs preserved) */}
           <Card className="bg-[#1c1c22] border border-white/5 p-6 rounded-2xl space-y-4 shadow-xl">
             <h4 className="text-cozy-sm text-[#94a3b8] uppercase font-bold tracking-wider border-b border-white/5 pb-2 flex items-center gap-2">
               <FileText className="w-4 h-4 text-[#fb923c]" /> Diário de Campanha
@@ -200,7 +194,7 @@ export default function CampaignDetailsPage() {
                     <Crown className="w-3.5 h-3.5 text-[#fb923c]" />
                   </div>
                   <div>
-                    <span className="text-cozy-xs font-bold text-[#f4ebd0] block">{campaign.mestre}</span>
+                    <span className="text-cozy-xs font-bold text-[#f4ebd0] block truncate">{isMestre ? "Você" : campaign.mestre}</span>
                   </div>
                 </div>
               </div>
@@ -213,9 +207,20 @@ export default function CampaignDetailsPage() {
                     <p className="text-cozy-xs text-[#94a3b8] opacity-60 italic text-center py-2 bg-[#121214] rounded-xl border border-white/5">Nenhum jogador na mesa.</p>
                   ) : (
                     campaign.jogadores.map((player, idx) => (
-                      <div key={idx} className="flex items-center gap-2.5 bg-[#121214] p-2.5 border border-white/5 rounded-xl text-cozy-xs text-[#94a3b8]">
-                        <span className="w-2 h-2 bg-[#34d399] rounded-full shrink-0" />
-                        <span className="truncate">{player}</span>
+                      <div key={idx} className="flex items-center justify-between gap-2 bg-[#121214] p-2.5 border border-white/5 rounded-xl text-cozy-xs text-[#94a3b8]">
+                        <span className="truncate flex items-center gap-2">
+                          <span className="w-2 h-2 bg-[#34d399] rounded-full shrink-0" />
+                          <span className="truncate">{player}</span>
+                        </span>
+                        {isMestre && (
+                          <button 
+                            onClick={() => handleRemovePlayer(player)}
+                            className="text-red-400 hover:text-red-300 p-0.5 rounded transition-colors"
+                            title="Remover Jogador"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                     ))
                   )}

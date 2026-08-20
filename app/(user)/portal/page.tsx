@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BlogService, Article } from "@/lib/services/blog.service";
@@ -9,13 +9,23 @@ import { Newspaper, ChevronRight, Heart, Send, BookOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/auth.context";
+import { CampaignService, Invitation } from "@/lib/services/campaign.service";
+import "../../globals.css";
 
 export default function UserPortalPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const blogService = new BlogService();
+  const campaignService = new CampaignService();
+
   const [articles, setArticles] = useState<Article[]>([]);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Invitations / Notifications state
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   // Likes & comments state
   const [likes, setLikes] = useState<Record<string, { count: number; liked: boolean }>>({
@@ -40,12 +50,51 @@ export default function UserPortalPage() {
 
   const [newComment, setNewComment] = useState("");
 
+  const loadInvitations = useCallback(async () => {
+    if (user?.email) {
+      try {
+        const list = await campaignService.getPendingInvitations(user.email);
+        setInvitations(list);
+      } catch (err) {
+        console.error("Erro ao carregar convites: ", err);
+      }
+    }
+  }, [user?.email]);
+
   useEffect(() => {
     blogService.getArticles().then(list => {
       setArticles(list.slice(0, 3));
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    loadInvitations();
+  }, [loadInvitations, refreshCounter]);
+
+  const handleAcceptInvite = async (invId: string, campId: string) => {
+    if (!user?.email) return;
+    try {
+      await campaignService.acceptInvitation(invId, campId, user.email);
+      loadInvitations();
+      setRefreshCounter(prev => prev + 1);
+      alert("Convite aceito com sucesso! Você agora participa desta mesa.");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeclineInvite = async (invId: string, campId: string) => {
+    if (!user?.email) return;
+    try {
+      await campaignService.declineInvitation(invId, campId, user.email);
+      loadInvitations();
+      setRefreshCounter(prev => prev + 1);
+      alert("Convite recusado.");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleLike = (artId: string) => {
     setLikes(prev => {
@@ -81,6 +130,41 @@ export default function UserPortalPage() {
         <h2 className="text-xl md:text-2xl font-black text-[#f4ebd0]">Central de Guardiões</h2>
         <p className="text-cozy-sm text-[#94a3b8] mt-1">Acompanhe as últimas atualizações da biblioteca e acesse suas campanhas.</p>
       </div>
+
+      {/* Invitations / Notifications Panel */}
+      {invitations.length > 0 && (
+        <div className="space-y-3 bg-[#1c1c22] border border-[#10b981]/30 p-5 rounded-[20px] shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[#10b981]/5 rounded-full blur-xl pointer-events-none" />
+          <h3 className="text-cozy-sm font-extrabold text-[#34d399] uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 bg-[#34d399] rounded-full animate-pulse" />
+            Novos Convites de RPG
+          </h3>
+          
+          <div className="space-y-2.5 mt-2">
+            {invitations.map((inv) => (
+              <div key={inv.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-[#121214] border border-white/5 rounded-xl text-cozy-xs">
+                <div className="text-[#94a3b8]">
+                  Você foi convidado para a campanha <b className="text-[#f4ebd0]">{inv.campaignName}</b> pelo mestre <span className="text-[#fb923c] font-semibold">{inv.mestreEmail}</span>.
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button 
+                    onClick={() => handleAcceptInvite(inv.id, inv.campaignId)}
+                    className="bg-[#10b981] hover:bg-[#34d399] text-[#121214] font-bold text-cozy-xs h-7 px-3 rounded-full"
+                  >
+                    Aceitar
+                  </Button>
+                  <Button 
+                    onClick={() => handleDeclineInvite(inv.id, inv.campaignId)}
+                    className="bg-red-950/40 border border-red-500/20 hover:bg-red-900/30 text-red-400 font-bold text-cozy-xs h-7 px-3 rounded-full"
+                  >
+                    Recusar
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Catarse Crowdfunding Banner */}
       <div className="bg-gradient-to-r from-[#5c3a21]/50 to-[#1c1c22]/90 border border-[#cd853f]/30 rounded-[20px] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
@@ -157,7 +241,7 @@ export default function UserPortalPage() {
       </div>
 
       {/* Campaigns Manager Organism Component */}
-      <CampaignManager limit={3} />
+      <CampaignManager limit={3} key={refreshCounter} />
 
       {/* Modal article reader with Interaction Section */}
       {selectedArticle && (() => {

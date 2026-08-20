@@ -17,31 +17,33 @@ import {
   Sparkles,
   Trophy
 } from "lucide-react";
+import { CampaignService } from "@/lib/services/campaign.service";
 
 export function RightUserPanel() {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const campaignService = new CampaignService();
 
-  const [activeCampCount, setActiveCampCount] = useState(2);
+  const [activeCampCount, setActiveCampCount] = useState(0);
   const [favClass, setFavClass] = useState("Arquivista");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedCamp = localStorage.getItem("portal-campaigns");
       const storedClass = localStorage.getItem("fav-class");
-      
-      if (storedCamp) {
-        try {
-          const list = JSON.parse(storedCamp);
-          setActiveCampCount(list.length);
-        } catch (e) {}
-      }
       if (storedClass) {
         setFavClass(storedClass);
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (user?.email) {
+      campaignService.getCampaigns(user.email).then((list) => {
+        setActiveCampCount(list.length);
+      });
+    }
+  }, [user?.email]);
 
   if (!user) return null;
 
@@ -105,8 +107,10 @@ export function RightUserPanel() {
             <span className="font-bold text-[#f4ebd0] text-cozy-sm">{activeCampCount} ativas</span>
           </div>
           <div className="bg-[#121214] p-2 rounded-lg border border-white/5">
-            <span className="text-[#94a3b8] block">Status</span>
-            <span className="font-bold text-[#34d399] text-cozy-xs truncate block" title="Apoiador Guardião">Apoiador</span>
+            <span className="text-[#94a3b8] block">Nível</span>
+            <span className="font-bold text-[#34d399] text-cozy-xs truncate block uppercase" title={user.role}>
+              {user.role === "admin" ? "Mestre" : "Jogador"}
+            </span>
           </div>
         </div>
 
