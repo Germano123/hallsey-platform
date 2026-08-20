@@ -8,9 +8,7 @@ export interface CrowdfundingMeta {
   daysRemaining: number;
 }
 
-const isMockMode =
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "AIzaSyDummyKeyForBuildPurposesOnly" ||
-  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+const isMockMode = false;
 
 const defaultMeta: CrowdfundingMeta = {
   currentFunding: 42850,

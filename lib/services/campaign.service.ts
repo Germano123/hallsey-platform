@@ -30,9 +30,7 @@ export interface Invitation {
   createdAt: string;
 }
 
-const isMockMode =
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "AIzaSyDummyKeyForBuildPurposesOnly" ||
-  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+const isMockMode = false;
 
 export class CampaignService {
   private campaignsCol = "campaigns";

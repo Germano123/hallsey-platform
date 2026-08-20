@@ -16,9 +16,7 @@ export interface Article {
   views?: number;
 }
 
-const isMockMode =
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "AIzaSyDummyKeyForBuildPurposesOnly" ||
-  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+const isMockMode = false;
 
 const defaultArticles: Article[] = [
   {
