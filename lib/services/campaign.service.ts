@@ -61,6 +61,34 @@ export class CampaignService {
     localStorage.setItem("portal-invitations", JSON.stringify(invites));
   }
 
+  // Fetch ALL campaigns in the system (for admins)
+  async getAllCampaigns(): Promise<Campaign[]> {
+    if (isMockMode) {
+      return this.getLocalCampaigns();
+    }
+
+    try {
+      const colRef = collection(db, this.campaignsCol);
+      const querySnapshot = await getDocs(colRef);
+      const list: Campaign[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        list.push({
+          id: doc.id,
+          name: data.name || "",
+          desc: data.desc || "",
+          mestre: data.mestre || "",
+          jogadores: Array.isArray(data.jogadores) ? data.jogadores : [],
+          convites: Array.isArray(data.convites) ? data.convites : [],
+        });
+      });
+      return list;
+    } catch (error) {
+      console.error("Erro ao carregar todas as campanhas: ", error);
+      return [];
+    }
+  }
+
   // Fetch campaigns for the user (associated as GM or Player)
   async getCampaigns(userEmail: string): Promise<Campaign[]> {
     if (isMockMode) {

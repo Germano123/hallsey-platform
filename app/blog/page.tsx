@@ -40,11 +40,13 @@ export default function BlogPage() {
     fetchArticles();
   }, []);
 
-  const filteredArticles = articles.filter(art => 
-    art.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    art.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    art.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredArticles = articles
+    .filter(art => !art.status || art.status === "posted")
+    .filter(art => 
+      art.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      art.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      art.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <div className="min-h-screen bg-[#121214] text-[#f4ebd0] font-cozy flex flex-col justify-between selection:bg-[#f97316] selection:text-[#121214]">

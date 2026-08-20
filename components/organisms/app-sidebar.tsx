@@ -33,16 +33,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, isAdmin } = useAuth();
 
   const navigationItems = [
-    {
-      title: "Biblioteca (Home)",
-      url: "/",
-      icon: BookOpen,
-    },
     ...(isAdmin ? [
       {
         title: "Painel Admin",
         url: "/dashboard",
         icon: BarChart3,
+      },
+      {
+        title: "Blog & Notícias",
+        url: "/blog-admin",
+        icon: Newspaper,
       }
     ] : [
       {
@@ -54,13 +54,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Minha Ficha NFC",
         url: "/perfil",
         icon: User,
+      },
+      {
+        title: "Blog & Notícias",
+        url: "/blog",
+        icon: Newspaper,
       }
     ]),
-    {
-      title: "Blog & Notícias",
-      url: "/blog",
-      icon: Newspaper,
-    },
   ];
 
   const adminItems = isAdmin ? [

@@ -67,7 +67,7 @@ export function BlogPostCreator({ authorName, onPostCreated }: BlogPostCreatorPr
   };
 
   return (
-    <div className="bg-[#1c1c22] border border-white/5 border-t-4 border-t-[#10b981] rounded-[20px] p-6 shadow-xl space-y-5">
+    <div className="bg-[#202024] border border-zinc-800 border-t-4 border-t-[#10b981] rounded-[20px] p-6 shadow-xl space-y-5">
       <div className="flex items-center gap-2">
         <PlusCircle className="w-5 h-5 text-[#10b981]" />
         <div>

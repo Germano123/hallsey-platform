@@ -1,5 +1,5 @@
 import { db } from "../firebase";
-import { collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { getStringDate } from "../utils";
 
 export interface Article {
@@ -12,6 +12,8 @@ export interface Article {
   content: string[];
   image: string;
   readTime: string;
+  status?: "posted" | "draft" | "scheduled";
+  views?: number;
 }
 
 const isMockMode =
@@ -33,7 +35,9 @@ const defaultArticles: Article[] = [
       "Cada apoiador receberá cartões físicos colecionáveis impressos em madeira ecológica ou metal escovado. Dentro de cada um, há um micro-chip NFC passivo ultratermo (não precisa carregar bateria). Ao encostar o cartão na parte traseira do seu celular (onde fica a câmera NFC) ou num leitor USB no computador, o portal do jogador identifica a chave criptográfica única do cartão.",
       "Em menos de 1 segundo, o portal invoca o feitiço ou equipa o item diretamente na sua ficha. Se você encostar o cartão 'Grimório do Aprendiz', seu personagem ganha os feitiços listados e os bônus de Sabedoria instantaneamente, sem precisar preencher dados manuais. É rápido, físico e adiciona uma sensação tátil indescritível à mesa!",
       "Além disso, no VTT (Mesa Virtual) integrado, o Mestre da Mesa visualiza o holograma ou miniatura do item conjurado na tela de todos os participantes. Seus amigos saberão exatamente qual item lendário você acabou de invocar!"
-    ]
+    ],
+    status: "posted",
+    views: 245
   },
   {
     id: "2",
@@ -49,7 +53,9 @@ const defaultArticles: Article[] = [
       "No jogo, essa classe atua como a linha de frente do grupo. Suas habilidades giram em torno de 'fechar' tomos no meio de combate para selar inimigos ou 'abrir' proteções grossas de pergaminho maciço. Eles podem costurar feitiços em roupas e conceder escudos mágicos aos seus aliados.",
       "A principal mecânica exclusiva é o 'Tomo de Proteção': um livro físico que o jogador carrega e pode converter em escudo pesado de energia se o livro estiver aberto. Seus cartões NFC específicos liberam tipos de costura diferentes: costura de ferro, de linho élfico e de ouro rúnico.",
       "Se você gosta de defender seus aliados com táticas defensivas imersivas e ama a arte da encadernação clássica, essa classe é perfeita para você!"
-    ]
+    ],
+    status: "posted",
+    views: 189
   },
   {
     id: "3",
@@ -65,7 +71,41 @@ const defaultArticles: Article[] = [
       "Graças a esse suporte incrível, a tiragem básica do Livro de Regras Físico Capa Dura está 100% garantida! Agora, estamos mirando as metas estendidas para enriquecer ainda mais a entrega do projeto.",
       "A próxima meta é a de R$ 50.000, que adicionará um marcador de páginas de metal exclusivo em forma de chave da biblioteca para todos os apoiadores físicos, além do aplicativo oficial de celular ganhar suporte a sons ambientais dinâmicos conforme o capítulo jogado.",
       "Se você ainda não compartilhou a campanha, chame seu grupo! O sucesso desse RPG depende de nossa união nas estantes!"
-    ]
+    ],
+    status: "posted",
+    views: 312
+  },
+  {
+    id: "4",
+    title: "Mecânicas de Combate em Bibliotecas Sombrias",
+    category: "Mecânicas",
+    date: "20 de Agosto, 2026",
+    author: "Mestre Germano",
+    readTime: "6 min",
+    image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=600&auto=format&fit=crop",
+    excerpt: "Ideias preliminares para regras de fuga e confinamento ao lutar contra Bibliófagos de grande porte.",
+    content: [
+      "Lutar dentro de setores restritos exige atenção redobrada com as estantes móveis...",
+      "Ao conjurar em corredores apertados, a propagação sonora mística pode ativar sensores rúnicos hostis. Lembrem-se de usar magias de silêncio!"
+    ],
+    status: "draft",
+    views: 0
+  },
+  {
+    id: "5",
+    title: "Entrevista com o Ilustrador Visual dos Textos-Mundo",
+    category: "Comunidade",
+    date: "25 de Agosto, 2026",
+    author: "Ordem dos Guardiões",
+    readTime: "8 min",
+    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
+    excerpt: "Bate-papo exclusivo sobre a concepção visual dos Textos-Mundo e a criação das larvas sombrias.",
+    content: [
+      "A criação artística partiu da premissa de que cada folha rasgada cria um vazio gravitacional no cenário...",
+      "Revelaremos a arte completa do livro de regras no dia oficial do kick-off no Catarse."
+    ],
+    status: "scheduled",
+    views: 0
   }
 ];
 
@@ -77,11 +117,11 @@ export class BlogService {
       if (typeof window !== "undefined") {
         const stored = localStorage.getItem("blog-articles");
         if (stored) {
-          return JSON.parse(stored);
-        } else {
-          localStorage.setItem("blog-articles", JSON.stringify(defaultArticles));
-          return defaultArticles;
+          try {
+            return JSON.parse(stored);
+          } catch (e) {}
         }
+        localStorage.setItem("blog-articles", JSON.stringify(defaultArticles));
       }
       return defaultArticles;
     }
@@ -101,15 +141,15 @@ export class BlogService {
           excerpt: data.excerpt,
           content: Array.isArray(data.content) ? data.content : [data.content],
           image: data.image,
-          readTime: data.readTime
+          readTime: data.readTime,
+          status: data.status || "posted",
+          views: Number(data.views) || 0
         });
       });
 
       if (list.length === 0) {
         return defaultArticles;
       }
-
-      // Sort by id or a mock timestamp
       return list;
     } catch (error) {
       console.error("Erro ao carregar notícias do Firebase: ", error);
@@ -121,7 +161,9 @@ export class BlogService {
     const newArticle: Article = {
       ...article,
       id: "art-" + Date.now(),
-      date: getStringDate(new Date())
+      date: getStringDate(new Date()),
+      status: article.status || "posted",
+      views: article.views || 0
     };
 
     if (isMockMode) {
@@ -141,7 +183,9 @@ export class BlogService {
         excerpt: newArticle.excerpt,
         content: newArticle.content,
         image: newArticle.image,
-        readTime: newArticle.readTime
+        readTime: newArticle.readTime,
+        status: newArticle.status,
+        views: newArticle.views
       });
     } catch (error) {
       console.error("Erro ao salvar artigo no Firebase: ", error);
