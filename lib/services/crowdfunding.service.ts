@@ -23,15 +23,6 @@ export class CrowdfundingService {
   // Get current crowdfunding configurations
   async getMeta(): Promise<CrowdfundingMeta> {
     if (isMockMode) {
-      if (typeof window !== "undefined") {
-        const stored = localStorage.getItem("crowdfunding-meta");
-        if (stored) {
-          try {
-            return JSON.parse(stored);
-          } catch (e) {}
-        }
-        localStorage.setItem("crowdfunding-meta", JSON.stringify(defaultMeta));
-      }
       return defaultMeta;
     }
 
@@ -41,10 +32,10 @@ export class CrowdfundingService {
       if (docSnap.exists()) {
         const data = docSnap.data();
         return {
-          currentFunding: Number(data.currentFunding) || defaultMeta.currentFunding,
-          targetFunding: Number(data.targetFunding) || defaultMeta.targetFunding,
-          backerCount: Number(data.backerCount) || defaultMeta.backerCount,
-          daysRemaining: Number(data.daysRemaining) || defaultMeta.daysRemaining,
+          currentFunding: data.currentFunding !== undefined ? Number(data.currentFunding) : defaultMeta.currentFunding,
+          targetFunding: data.targetFunding !== undefined ? Number(data.targetFunding) : defaultMeta.targetFunding,
+          backerCount: data.backerCount !== undefined ? Number(data.backerCount) : defaultMeta.backerCount,
+          daysRemaining: data.daysRemaining !== undefined ? Number(data.daysRemaining) : defaultMeta.daysRemaining,
         };
       } else {
         // Initialize doc in Firestore
@@ -60,9 +51,6 @@ export class CrowdfundingService {
   // Update crowdfunding configurations
   async updateMeta(meta: CrowdfundingMeta): Promise<void> {
     if (isMockMode) {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("crowdfunding-meta", JSON.stringify(meta));
-      }
       return;
     }
 
