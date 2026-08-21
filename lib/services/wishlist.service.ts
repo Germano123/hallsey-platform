@@ -1,32 +1,21 @@
 import { db } from "../firebase";
-import { collection, addDoc, getDocs, query, orderBy, Timestamp } from "firebase/firestore";
-import { getStringDate } from "../utils";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 export interface WishlistEntry {
   id?: string;
   name: string;
   email: string;
   favoriteClass?: string;
-  createdAt?: string;
+  createdAt?: string; // Raw ISO String
 }
 
-const isMockMode =
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "AIzaSyDummyKeyForBuildPurposesOnly" ||
-  !process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+const isMockMode = false;
 
 export class WishlistService {
   private collectionName = "wishlist";
 
   async addToWishlist(entry: WishlistEntry): Promise<void> {
     if (isMockMode) {
-      const stored = localStorage.getItem("wishlist") || "[]";
-      const list = JSON.parse(stored);
-      list.push({
-        ...entry,
-        id: "mock-" + Date.now(),
-        createdAt: getStringDate(new Date())
-      });
-      localStorage.setItem("wishlist", JSON.stringify(list));
       return;
     }
 
@@ -46,8 +35,7 @@ export class WishlistService {
 
   async getWishlist(): Promise<WishlistEntry[]> {
     if (isMockMode) {
-      const stored = localStorage.getItem("wishlist") || "[]";
-      return JSON.parse(stored);
+      return [];
     }
 
     try {
@@ -58,10 +46,10 @@ export class WishlistService {
         const data = doc.data();
         list.push({
           id: doc.id,
-          name: data.name,
-          email: data.email,
+          name: data.name || "",
+          email: data.email || "",
           favoriteClass: data.favoriteClass || "Indeciso",
-          createdAt: data.createdAt ? getStringDate(new Date(data.createdAt)) : getStringDate(new Date())
+          createdAt: data.createdAt || new Date().toISOString()
         });
       });
       
