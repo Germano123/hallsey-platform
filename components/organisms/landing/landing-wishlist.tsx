@@ -109,7 +109,7 @@ export function LandingWishlist() {
               />
             </div>
 
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               <Label htmlFor="wishlist-class" className="text-xs text-[#f4ebd0] font-medium">Escolha sua Classe RPG favorita</Label>
               <select 
                 id="wishlist-class"
@@ -122,7 +122,7 @@ export function LandingWishlist() {
                 <option value="Encadernador">Encadernador (Foco em forja física de armas e armaduras de livro)</option>
                 <option value="Tecelão do Verbo">Tecelão do Verbo (Foco em conjuração elemental e poções)</option>
               </select>
-            </div>
+            </div> */}
 
             <Button 
               type="submit"
