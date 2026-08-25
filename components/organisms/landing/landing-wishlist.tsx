@@ -133,9 +133,9 @@ export function LandingWishlist() {
           </form>
         )}
 
-        <div className="mt-4 text-xs text-[#94a3b8]">
+        {/* <div className="mt-4 text-xs text-[#94a3b8]">
           Junte-se a <span className="text-[#34d399] font-bold">{wishlistCount} guardiões</span> prontos para reescrever as páginas.
-        </div>
+        </div> */}
       </div>
     </section>
   );
