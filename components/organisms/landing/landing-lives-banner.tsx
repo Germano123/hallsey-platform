@@ -5,9 +5,9 @@ import { Calendar, Tv, Sparkles } from "lucide-react";
 
 export function LandingLivesBanner() {
   const schedule = [
-    { day: "Segunda-feira", time: "20:00", title: "Criação de Fichas & Classes" },
-    { day: "Quarta-feira", time: "20:00", title: "Revelação das Mecânicas NFC" },
-    { day: "Sexta-feira", time: "21:00", title: "Playtest Imersivo Oficial" }
+    { day: "Quarta-feira", time: "20:00", title: "Biblioteca da 5ª Avenida" },
+    { day: "Sexta-feira", time: "21:00", title: "Biblioteca da 5ª Avenida" },
+    { day: "Sábado", time: "20:00", title: "Biblioteca da 5ª Avenida" },
   ];
 
   return (
@@ -35,7 +35,7 @@ export function LandingLivesBanner() {
           {/* Social CTA Buttons */}
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3">
             <a 
-              href="https://twitch.tv/seu-canal-aqui" 
+              href="https://www.twitch.tv/hallseydev" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#9146FF] hover:bg-[#772ce8] text-white font-extrabold text-sm px-6 py-3 rounded-xl transition-all shadow-lg shadow-[#9146FF]/20 hover:scale-105"
@@ -45,7 +45,7 @@ export function LandingLivesBanner() {
             </a>
             
             <a 
-              href="https://tiktok.com/@seu-perfil-aqui" 
+              href="https://www.tiktok.com/@_profhallsey?_r=1&_t=ZS-99BaB5kO8qT" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-black hover:bg-[#121214] text-white border border-zinc-800 font-extrabold text-sm px-6 py-3 rounded-xl transition-all hover:scale-105"
