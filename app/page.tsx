@@ -4,6 +4,7 @@ import React from "react";
 import { useAuth } from "@/contexts/auth.context";
 import { LandingHeader } from "@/components/organisms/landing/landing-header";
 import { LandingHero } from "@/components/organisms/landing/landing-hero";
+import { LandingLivesBanner } from "@/components/organisms/landing/landing-lives-banner";
 import { LandingNarrativa } from "@/components/organisms/landing/landing-narrativa";
 import { LandingNfcMechanic } from "@/components/organisms/landing/landing-nfc-mechanic";
 import { LandingWishlist } from "@/components/organisms/landing/landing-wishlist";
@@ -22,6 +23,9 @@ export default function LandingPage() {
 
       {/* 2. Hero Section */}
       <LandingHero />
+
+      {/* 2.5 Lives Banner Section */}
+      <LandingLivesBanner />
 
       {/* 3. Narrativa Section */}
       <LandingNarrativa />
